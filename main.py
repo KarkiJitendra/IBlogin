@@ -1,21 +1,11 @@
+# main.py
 from fastapi import FastAPI
-from database import engine, database
-import models
-from routers import user_router
+from loginservice.api.routers import auth_router
 
 app = FastAPI()
 
-# Include routers
-app.include_router(user_router.router)
+app.include_router(auth_router.router, prefix="/auth", tags=["Authentication"])
 
-# Startup and shutdown events for async database connection
-@app.on_event("startup")
-async def startup():
-    await database.connect()
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
-
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
